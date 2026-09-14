@@ -26,7 +26,7 @@
   "topbarLinks": [
     {
       "name": "Product",
-      "url": "https://layermetry.com/product"
+      "url": "https://layermetry.com/sdk"
     },
     {
       "name": "Use cases",
@@ -124,7 +124,7 @@
         "links": [
           {
             "label": "Overview",
-            "url": "https://layermetry.com/product"
+            "url": "https://layermetry.com/sdk"
           },
           {
             "label": "Use cases",
