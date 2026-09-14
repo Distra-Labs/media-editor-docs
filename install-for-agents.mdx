@@ -1,0 +1,189 @@
+---
+title: "Install for agents"
+description: "How a coding agent or an AI assistant drives @layermetry/media-editor: verbs, previewing a plan before it runs, and a record of what ran."
+---
+
+## Who this page is for
+
+Two readers.
+
+If you are a **developer** giving an AI assistant control of the editor inside
+your product, this page explains what the assistant can and cannot touch, and
+how you approve its work.
+
+If you are an **AI agent** reading this to learn the SDK, the short version is
+at the bottom under [Reading these docs as a machine](#reading-these-docs-as-a-machine).
+Fetch `https://layermetry.com/docs/skill.md` first.
+
+## The problem this solves
+
+Hand a language model a drawing canvas and it will produce something. Ask it for
+the same thing twice and you get two different results, because that is what a
+language model is. That is fine for a first draft and useless for a brand.
+
+So the model never touches the document. Instead, editing is broken into small,
+named, precisely-described operations — **verbs**. A verb is something like
+"set the text of layer 4 to this string" or "trim this clip to these two
+timestamps". Each one has a written description of exactly which values it
+accepts, in the same machine-readable form as any other tool a model can call.
+
+The model's job is to **propose** verbs. Your application, or your user, says
+yes. Only then does the SDK check the proposal and apply it.
+
+That split is the whole design. The model is allowed to be creative about
+*which* verbs to propose. It is never allowed to be creative about what a verb
+does, because it never runs one. Two identical lists of verbs produce two
+identical documents, every time.
+
+## What is actually available today
+
+Numbers matter here, so here they are with a date on them. As of 2026-09-14,
+**294 possible verbs have been reviewed** and each one has a decision recorded
+against it.
+
+| Decision | How many | What it means |
+|---|---|---|
+| Live | **44** | Built, tested, callable today. |
+| Next | 2 | Being built now. |
+| Deferred | 61 | Will be built; nobody needs them yet. |
+| Blocked | 94 | Cannot be built until something else lands first. |
+| Recommended against | 87 | Reviewed and turned down. Building them would make the surface worse. |
+| **Never exposed** | **6** | Deliberately withheld from any model, permanently. |
+
+So: **44 verbs are live today.** Do not plan around the other 250. When a verb
+is not live, `instruct` will say so rather than guess at something close.
+
+### The six that no model will ever get
+
+Six verbs are marked never-exposed. They are the ones where a wrong call cannot
+be undone by the person watching, or where the damage would be to something
+outside the document. They stay available to your own code, through the normal
+API, where a human wrote the call. They are not a feature that is coming later
+and they are not unlocked by a plan.
+
+## The natural-language door
+
+`instruct(task)` takes an ordinary sentence and turns it into a list of verbs.
+
+```js
+const result = await editor.instruct('Make the headline two lines and centre it');
+```
+
+It does the translating, and nothing else: it is the only place a language model
+is involved, and its output is a list of verb calls, not a modified document.
+
+### Look before you leap: `dryRun`
+
+Ask what it *would* do, and get the plan back without anything happening.
+
+```js
+const plan = await editor.instruct(
+  'Make the headline two lines and centre it',
+  { dryRun: true }
+);
+
+// plan is the list of verbs it would run, in order,
+// with the exact values it would pass.
+console.log(plan.verbs);
+```
+
+Show that plan to your user. Let them say yes. Then run it.
+
+That one step changes what your product is. Without it, an assistant edits your
+customer's work. With it, an assistant suggests an edit and your customer
+decides. The SDK supports both; you choose which one you ship.
+
+### After it runs: receipts
+
+Every `instruct` call returns a **receipt** — the precise list of verbs that
+actually ran, with the exact values each one was given.
+
+```js
+const result = await editor.instruct('Make the headline two lines and centre it');
+console.log(result.receipt);
+```
+
+A receipt is not a log line. It is the operation itself, written down, so it can
+be:
+
+- **replayed** — run the same receipt against the same starting document and you
+  get the same finished document, with no model involved the second time;
+- **undone** — step back through it;
+- **audited** — six months later, someone can read exactly what was changed, by
+  which instruction, and in what order.
+
+Store receipts if you need to answer "who changed this, and why". They are the
+only honest answer to that question, because they are what ran.
+
+## Registering your own verbs
+
+Your application can add verbs of its own next to the built-in ones. They are
+described the same way and approved the same way, so an agent sees one flat list
+and does not have to know which are yours.
+
+This is how you give an agent the parts of *your* product it should be able to
+drive, without giving it your whole product.
+
+## Where the model runs
+
+The editor calls a model through the Vercel AI SDK, version 5. The providers
+wired up today are OpenAI, Anthropic and Fal.
+
+You can point it at your own endpoint instead, with `aiProviders` and
+`aiProxyUrl`. Requests then go from your user's browser to your endpoint, and
+the media never reaches layermetry. Anything speaking the OpenAI request format
+works, including a model you run on your own hardware.
+
+## On the roadmap
+
+Marked as roadmap because it is not built. Do not plan a release around it.
+
+- **An MCP server exposing the verbs.** MCP — Model Context Protocol — is a
+  standard way for an assistant such as Claude or Cursor to discover and call
+  tools that live outside itself. With it, an assistant would reach the verbs
+  directly, without your application wiring each one up. It is planned. It does
+  not exist today.
+- **Models fine-tuned on the verbs**, so proposals need less correcting.
+- **The remaining image verbs**, to bring the image editor to the same coverage
+  as the video editor.
+
+## Reading these docs as a machine
+
+Three files, in this order. All three are plain text over HTTPS and none needs a
+key.
+
+<Steps>
+
+<Step title="https://layermetry.com/docs/skill.md">
+Start here. It is short on purpose: what the package is, how to install it, how
+to mount it, the verbs, and the rules about what is claimed as working versus
+planned. If you read only one file, read this one.
+</Step>
+
+<Step title="https://layermetry.com/docs/llms.txt">
+The map. Every page on this site with its address and a line about what is on
+it. Use it to decide what to fetch next, rather than guessing at URLs.
+</Step>
+
+<Step title="https://layermetry.com/docs/llms-full.txt">
+Everything, concatenated into one file. Large. Fetch it when you want the whole
+manual in context; otherwise use `llms.txt` and fetch single pages.
+</Step>
+
+</Steps>
+
+Any page on this site can be fetched as plain markdown instead of HTML by adding
+`.md` to its address. So `https://layermetry.com/docs/installation` also exists
+as `https://layermetry.com/docs/installation.md`. Prefer the `.md` form: same
+words, none of the page furniture.
+
+### Three rules for an agent writing layermetry code
+
+1. **The package is `@layermetry/media-editor`.** If you have seen
+   `@layermetry/media-editor` in an older source, that name is out of date. The
+   current version is 2.0.0.
+2. **React 18 and React 19 both work.** Older documentation said React 19 was not
+   supported. That is no longer true, and you should not pin React to 18.2.0.
+3. **Do not invent verb names.** 44 verbs are live; the rest are not. Ask the
+   running editor for the list rather than assuming a verb exists because its
+   name would be obvious.

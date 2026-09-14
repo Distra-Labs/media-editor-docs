@@ -58,12 +58,12 @@ Both editors use browser-only APIs and **must** be imported dynamically with `ss
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 
 const VideoEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.VideoEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.VideoEditor })),
   { ssr: false }
 );
 ```

@@ -10,14 +10,25 @@ This guide is for **React.js** applications (Create React App, Vite, custom setu
 For **Next.js**, see the [Next.js VideoEditor Integration](/integration-guides/nextjs-video-editor) guide.
 </Note>
 
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) `ffmpeg` was removed, so the 31 MB of
+WebAssembly named below no longer ships with the package and there is nothing to
+copy into `public/`. React is no longer pinned to 18.2.0 either — React 18 and
+React 19 both work, and the editor also runs with no React at all.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
+
 ## Prerequisites
 
 <CardGroup cols={3}>
-  <Card title="Node.js 16+" icon="node-js">
-    Node.js version 16.x or higher
+  <Card title="Node.js 18+" icon="node-js">
+    Node.js 18 or newer
   </Card>
-  <Card title="React 18.2.0" icon="react">
-    React version 18.2.0 (not React 19)
+  <Card title="React 18 or 19" icon="react">
+    React 18 or React 19 — both work. Version 2 does not pin React.
   </Card>
   <Card title="Storage Space" icon="hard-drive">
     ~40MB for WASM modules
@@ -33,7 +44,7 @@ VideoEditor uses WebAssembly (WASM) for video processing. These files must be co
 <Steps>
   <Step title="Install the SDK">
     ```bash
-    npm install @distralabs/media-editor
+    npm install @layermetry/media-editor
     ```
   </Step>
 
@@ -48,17 +59,17 @@ VideoEditor uses WebAssembly (WASM) for video processing. These files must be co
 
     ```bash
     # Copy MediaInfo WASM module
-    cp node_modules/@distralabs/media-editor/dist/MediaInfoModule.wasm public/
+    cp node_modules/@layermetry/media-editor/dist/MediaInfoModule.wasm public/
 
     # Copy FFmpeg workers
-    cp node_modules/@distralabs/media-editor/dist/worker.js public/
-    cp node_modules/@distralabs/media-editor/dist/const.js public/
-    cp node_modules/@distralabs/media-editor/dist/errors.js public/
-    cp node_modules/@distralabs/media-editor/dist/decode_worker.js public/
-    cp node_modules/@distralabs/media-editor/dist/encode_worker.js public/
+    cp node_modules/@layermetry/media-editor/dist/worker.js public/
+    cp node_modules/@layermetry/media-editor/dist/const.js public/
+    cp node_modules/@layermetry/media-editor/dist/errors.js public/
+    cp node_modules/@layermetry/media-editor/dist/decode_worker.js public/
+    cp node_modules/@layermetry/media-editor/dist/encode_worker.js public/
 
     # Copy FFmpeg core
-    cp -r node_modules/@distralabs/media-editor/dist/umd public/
+    cp -r node_modules/@layermetry/media-editor/dist/umd public/
     ```
   </Step>
 
@@ -105,14 +116,14 @@ const files = [
 ];
 
 files.forEach(file => {
-  const src = path.join(__dirname, '../node_modules/@distralabs/media-editor/dist', file);
+  const src = path.join(__dirname, '../node_modules/@layermetry/media-editor/dist', file);
   const dest = path.join(__dirname, '../public', file);
   fs.copyFileSync(src, dest);
   console.log(`✓ Copied ${file}`);
 });
 
 // Copy umd directory
-const umdSrc = path.join(__dirname, '../node_modules/@distralabs/media-editor/dist/umd');
+const umdSrc = path.join(__dirname, '../node_modules/@layermetry/media-editor/dist/umd');
 const umdDest = path.join(__dirname, '../public/umd');
 fs.cpSync(umdSrc, umdDest, { recursive: true });
 console.log('✓ Copied umd/ directory');
@@ -163,8 +174,8 @@ interface VideoExportResult {
 
 ```javascript src/components/VideoStudio.js
 import React, { useState, useCallback, useRef } from 'react';
-import { VideoEditor } from '@distralabs/media-editor';
-import '@distralabs/media-editor/dist/index.css';
+import { VideoEditor } from '@layermetry/media-editor';
+import '@layermetry/media-editor/dist/index.css';
 
 function VideoStudio() {
   const fileInputRef = useRef(null);
@@ -345,8 +356,8 @@ const videoTheme = {
 <Accordion title="View Full Component Code">
 ```javascript src/components/VideoStudio.js
 import React, { useState, useCallback, useRef } from 'react';
-import { VideoEditor } from '@distralabs/media-editor';
-import '@distralabs/media-editor/dist/index.css';
+import { VideoEditor } from '@layermetry/media-editor';
+import '@layermetry/media-editor/dist/index.css';
 
 const videoTheme = {
   'background.primary': '#0f172a',

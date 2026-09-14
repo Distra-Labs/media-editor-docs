@@ -1,0 +1,44 @@
+/* =========================================================================
+   layermetry docs — code font
+
+   Mintlify's docs.json can set the heading font and the body font, and that is
+   all it can set. There is no key for the font used inside code blocks. So the
+   code font has to come from here.
+
+   Mintlify loads every .css file that sits in the same folder as docs.json, on
+   every page, automatically. Nothing in docs.json points at this file, and
+   nothing needs to.
+
+   The @import below must stay the first thing in this file. A browser ignores a
+   CSS @import if any ordinary rule comes before it, so moving it down would
+   silently stop the font from loading.
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap');
+
+/* Geist Mono for anything that shows code: fenced blocks, inline code, keyboard
+   keys, and sample output. The names after Geist Mono are what the browser
+   falls back to while the web font is downloading, or if it never arrives.
+
+   !important is here because Mintlify sets the code font from its own compiled
+   stylesheet, which loads after this file. Without it, the rule below loses.
+
+   If a code block still shows the old font after deploying, open one in the
+   browser's inspector, read the class name Mintlify puts on it, and add that
+   class to the list of selectors below. */
+code,
+pre,
+kbd,
+samp,
+pre code,
+.font-mono {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, 'Liberation Mono', monospace !important;
+}
+
+/* Geist Mono's default letter spacing is slightly wide at small sizes, which
+   makes a long install command wrap earlier than it needs to. */
+pre,
+pre code {
+  letter-spacing: -0.01em;
+}

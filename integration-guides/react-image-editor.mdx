@@ -10,14 +10,24 @@ This guide is for **React.js** applications (Create React App, Vite, custom setu
 For **Next.js**, see the [Next.js ImageEditor Integration](/integration-guides/nextjs-image-editor) guide.
 </Note>
 
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) React is no longer pinned to 18.2.0 — React 18
+and React 19 both work, and the editor also runs with no React at all, so
+Next.js 15 is fine.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
+
 ## Prerequisites
 
 <CardGroup cols={2}>
-  <Card title="Node.js 16+" icon="node-js">
-    Node.js version 16.x or higher
+  <Card title="Node.js 18+" icon="node-js">
+    Node.js 18 or newer
   </Card>
-  <Card title="React 18.2.0" icon="react">
-    React version 18.2.0 (not React 19)
+  <Card title="React 18 or 19" icon="react">
+    React 18 or React 19 — both work. Version 2 does not pin React.
   </Card>
 </CardGroup>
 
@@ -26,7 +36,7 @@ For **Next.js**, see the [Next.js ImageEditor Integration](/integration-guides/n
 <Steps>
   <Step title="Install the SDK">
     ```bash
-    npm install @distralabs/media-editor
+    npm install @layermetry/media-editor
     ```
   </Step>
 
@@ -64,7 +74,7 @@ import './index.css';
 import App from './App';
 
 // Import media-editor SDK styles
-import '@distralabs/media-editor/dist/index.css';
+import '@layermetry/media-editor/dist/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -76,7 +86,7 @@ root.render(
 
 ```javascript src/App.js
 import React from 'react';
-import '@distralabs/media-editor/dist/index.css';
+import '@layermetry/media-editor/dist/index.css';
 import './App.css';
 
 function App() {
@@ -89,7 +99,7 @@ function App() {
 ### Import the Editor
 
 ```javascript
-import { ImageEditor } from '@distralabs/media-editor';
+import { ImageEditor } from '@layermetry/media-editor';
 ```
 
 ## ImageEditor Interface
@@ -136,8 +146,8 @@ interface EditorExtras {
 
 ```javascript src/components/ImageStudio.js
 import React, { useState, useCallback, useRef } from 'react';
-import { ImageEditor } from '@distralabs/media-editor';
-import '@distralabs/media-editor/dist/index.css';
+import { ImageEditor } from '@layermetry/media-editor';
+import '@layermetry/media-editor/dist/index.css';
 
 function ImageStudio() {
   const fileInputRef = useRef(null);
@@ -288,8 +298,8 @@ const customTheme = {
 <Accordion title="View Full Component Code">
 ```javascript src/components/ImageStudio.js
 import React, { useState, useCallback, useRef } from 'react';
-import { ImageEditor } from '@distralabs/media-editor';
-import '@distralabs/media-editor/dist/index.css';
+import { ImageEditor } from '@layermetry/media-editor';
+import '@layermetry/media-editor/dist/index.css';
 import './ImageStudio.css';
 
 const customTheme = {

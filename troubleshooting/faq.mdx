@@ -1,6 +1,17 @@
 # Next.js Integration FAQ
 
-Frequently asked questions and common issues when integrating `@distralabs/media-editor` with Next.js.
+Frequently asked questions and common issues when integrating `@layermetry/media-editor` with Next.js.
+
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) `ffmpeg` was removed, so the 31 MB of
+WebAssembly named below no longer ships with the package and there is nothing to
+copy into `public/`. React is no longer pinned to 18.2.0 either — React 18 and
+React 19 both work, and the editor also runs with no React at all.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
 
 ## Table of Contents
 - [React Version Issues](#react-version-issues)
@@ -17,7 +28,7 @@ Frequently asked questions and common issues when integrating `@distralabs/media
 
 ### Error: "Cannot read properties of undefined (reading 'ReactCurrentOwner')"
 
-**Cause:** Next.js 15+ requires React 19, but the media-editor SDK requires React 18.2.0. This creates a version conflict.
+**Cause:** two copies of React are loaded at once. In version 1 this happened because the SDK carried its own React 18.2.0 alongside the React 19 that Next.js 15 installs. Version 2 does not bundle React at all, so upgrading to `@layermetry/media-editor` 2.0.0 is the real fix. The downgrade below is the version 1 workaround, kept for anyone still on version 1.
 
 **Solution:**
 
@@ -89,17 +100,17 @@ export default function RootLayout({ children }) {
 
 ## Module Resolution Errors
 
-### Error: "Module not found: Can't resolve '@distralabs/media-editor'"
+### Error: "Module not found: Can't resolve '@layermetry/media-editor'"
 
 **Cause:** Package not installed or path aliases conflicting.
 
 **Solution 1 - Verify Installation:**
 ```bash
-npm list @distralabs/media-editor
-# Should show: @distralabs/media-editor@1.1.9
+npm list @layermetry/media-editor
+# Should show: @layermetry/media-editor
 
 # If not found:
-npm install @distralabs/media-editor@1.1.9
+npm install @layermetry/media-editor
 ```
 
 **Solution 2 - Remove Path Aliases:**
@@ -110,7 +121,7 @@ Check `next.config.js` and remove any custom path aliases that might conflict:
 // WRONG - removes custom aliases
 const nextConfig = {
   webpack: (config) => {
-    config.resolve.alias['@distralabs/media-editor'] = '...';
+    config.resolve.alias['@layermetry/media-editor'] = '...';
     return config;
   }
 };
@@ -139,7 +150,7 @@ const nextConfig = {
 ```json
 {
   "dependencies": {
-    "@distralabs/media-editor": "^1.1.9"  // NOT "file:.."
+    "@layermetry/media-editor": "^2.0.0"  // NOT "file:.."
   }
 }
 ```
@@ -218,13 +229,13 @@ curl -k https://localhost:3030/social/license/validate
 ```bash
 # From your Next.js project root
 mkdir -p public
-cp node_modules/@distralabs/media-editor/dist/MediaInfoModule.wasm public/
-cp node_modules/@distralabs/media-editor/dist/worker.js public/
-cp node_modules/@distralabs/media-editor/dist/const.js public/
-cp node_modules/@distralabs/media-editor/dist/errors.js public/
-cp node_modules/@distralabs/media-editor/dist/decode_worker.js public/
-cp node_modules/@distralabs/media-editor/dist/encode_worker.js public/
-cp -r node_modules/@distralabs/media-editor/dist/umd public/
+cp node_modules/@layermetry/media-editor/dist/MediaInfoModule.wasm public/
+cp node_modules/@layermetry/media-editor/dist/worker.js public/
+cp node_modules/@layermetry/media-editor/dist/const.js public/
+cp node_modules/@layermetry/media-editor/dist/errors.js public/
+cp node_modules/@layermetry/media-editor/dist/decode_worker.js public/
+cp node_modules/@layermetry/media-editor/dist/encode_worker.js public/
+cp -r node_modules/@layermetry/media-editor/dist/umd public/
 ```
 
 **Solution 2 - Add URL Rewrites:**
@@ -287,7 +298,7 @@ Add SDK CSS to your global styles:
 @import "tailwindcss";
 
 /* IMPORTANT: Import SDK styles */
-@import "@distralabs/media-editor/dist/index.css";
+@import "@layermetry/media-editor/dist/index.css";
 
 /* Your other styles below */
 ```
@@ -408,7 +419,7 @@ Use dynamic import with `ssr: false`:
 
 ```typescript
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }  // CRITICAL: Disable SSR
 );
 ```
@@ -453,14 +464,14 @@ const files = [
 ];
 
 files.forEach(file => {
-  const src = path.join(__dirname, '../node_modules/@distralabs/media-editor/dist', file);
+  const src = path.join(__dirname, '../node_modules/@layermetry/media-editor/dist', file);
   const dest = path.join(__dirname, '../public', file);
   fs.copyFileSync(src, dest);
   console.log(`Copied ${file} to public/`);
 });
 
 // Copy umd directory
-const umdSrc = path.join(__dirname, '../node_modules/@distralabs/media-editor/dist/umd');
+const umdSrc = path.join(__dirname, '../node_modules/@layermetry/media-editor/dist/umd');
 const umdDest = path.join(__dirname, '../public/umd');
 fs.cpSync(umdSrc, umdDest, { recursive: true });
 console.log('Copied umd/ directory to public/');
@@ -554,7 +565,7 @@ If your issue isn't covered here:
 When reporting issues, include:
 1. Next.js version (`npm list next`)
 2. React version (`npm list react`)
-3. SDK version (`npm list @distralabs/media-editor`)
+3. SDK version (`npm list @layermetry/media-editor`)
 4. Full error message from console
 5. Network tab screenshot (if relevant)
 6. Minimal reproduction code
@@ -565,9 +576,8 @@ When reporting issues, include:
 
 Before asking for help, verify:
 
-- [ ] Using Next.js 14.2.15 (not 15+)
-- [ ] Using React 18.2.0 (not 19)
-- [ ] SDK installed: `@distralabs/media-editor@1.1.9`
+- [ ] Using React 18 or React 19 (version 2 accepts both, and any Next.js version)
+- [ ] SDK installed: `@layermetry/media-editor`
 - [ ] SDK CSS imported in globals.css
 - [ ] Dynamic import with `ssr: false` used
 - [ ] WASM files copied to `public/` folder
@@ -583,10 +593,13 @@ Before asking for help, verify:
 
 | Next.js | React | SDK     | Status |
 |---------|-------|---------|--------|
-| 15.x    | 19.x  | 1.1.9   | ❌ Not Compatible |
-| 14.2.x  | 18.2  | 1.1.9   | ✅ Recommended |
-| 14.0.x  | 18.2  | 1.1.9   | ✅ Compatible |
-| 13.x    | 18.2  | 1.1.9   | ⚠️ Not Tested |
+| 15.x    | 19.x  | 2.0.0   | ✅ Works |
+| 14.2.x  | 18.2  | 2.0.0   | ✅ Works |
+| 14.0.x  | 18.2  | 2.0.0   | ✅ Works |
+| 13.x    | 18.2  | 2.0.0   | ⚠️ Not Tested |
+
+Version 2 no longer brings its own copy of React, so the host framework version
+no longer constrains the SDK.
 
 ---
 
