@@ -7,33 +7,40 @@ description: 'Get started with layermetry SDK in under 5 minutes'
 
 Get up and running with the layermetry SDK in your Next.js application.
 
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) React is no longer pinned to 18.2.0 — React 18
+and React 19 both work, and the editor also runs with no React at all, so
+Next.js 15 is fine.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
+
 ### 1. Install the Package
 
 <CodeGroup>
 
 ```bash npm
-npm install @distralabs/media-editor@1.1.9
+npm install @layermetry/media-editor
 ```
 
 ```bash yarn
-yarn add @distralabs/media-editor@1.1.9
+yarn add @layermetry/media-editor
 ```
 
 ```bash pnpm
-pnpm add @distralabs/media-editor@1.1.9
+pnpm add @layermetry/media-editor
 ```
 
 </CodeGroup>
 
 ### 2. Install Dependencies
 
-```bash
-npm install next@14.2.15 react@18.2.0 react-dom@18.2.0
-npm install framer-motion lucide-react
-```
-
 <Warning>
-The SDK requires **React 18.2.0** and is not compatible with React 19. You must use **Next.js 14.2.15** or lower.
+Version 2 works in **React 18 and React 19**, so any Next.js version is fine. It
+also works with no React at all. If you pinned `react@18.2.0` for version 1,
+remove the pin.
 </Warning>
 
 ### 3. Configure Next.js
@@ -63,7 +70,7 @@ Add to **app/globals.css**:
 @import "tailwindcss";
 
 /* Import SDK styles */
-@import "@distralabs/media-editor/dist/index.css";
+@import "@layermetry/media-editor/dist/index.css";
 ```
 
 ### 5. Create Your First Editor
@@ -77,7 +84,7 @@ import { useState } from 'react';
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 

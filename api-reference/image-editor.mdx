@@ -17,7 +17,7 @@ The `ImageEditor` component provides a powerful image editing interface with sup
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 ```
@@ -267,7 +267,7 @@ import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 

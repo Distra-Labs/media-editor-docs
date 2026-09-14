@@ -1,6 +1,16 @@
 # Next.js ImageEditor Integration Guide
 
-Complete guide for integrating the `@distralabs/media-editor` ImageEditor component into your Next.js application.
+Complete guide for integrating the `@layermetry/media-editor` ImageEditor component into your Next.js application.
+
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) React is no longer pinned to 18.2.0 — React 18
+and React 19 both work, and the editor also runs with no React at all, so
+Next.js 15 is fine.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -16,16 +26,16 @@ Complete guide for integrating the `@distralabs/media-editor` ImageEditor compon
 
 ## Prerequisites
 
-- Node.js 16.x or higher
+- Node.js 18 or newer
 - Next.js 14.x or 15.x
-- React 18.2.0 (SDK requires React 18, not React 19)
+- React 18 or React 19 — both work. Version 2 does not pin React, and also runs with no React at all.
 
 ## Installation
 
 ### 1. Install the SDK
 
 ```bash
-npm install @distralabs/media-editor
+npm install @layermetry/media-editor
 ```
 
 ### 2. Install Required Dependencies
@@ -42,7 +52,7 @@ If you're using Next.js 15+ (which requires React 19), you need to downgrade to 
 ```json
 {
   "dependencies": {
-    "@distralabs/media-editor": "^1.1.9",
+    "@layermetry/media-editor": "^2.0.0",
     "next": "14.2.15",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -73,7 +83,7 @@ Add the SDK CSS to your global styles file:
 @import "tailwindcss";
 
 /* Import media-editor SDK styles */
-@import "@distralabs/media-editor/dist/index.css";
+@import "@layermetry/media-editor/dist/index.css";
 
 /* Your other styles */
 ```
@@ -108,7 +118,7 @@ The SDK uses browser-only APIs, so you must use dynamic imports:
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 ```
@@ -176,7 +186,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamic import to avoid SSR
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 
@@ -419,7 +429,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 
@@ -603,8 +613,8 @@ export default function ImageStudioPage() {
 
 ## Next Steps
 
-1. See [FAQ.md](./FAQ.md) for common issues and troubleshooting
-2. See [NEXTJS_VIDEOEDITOR_INTEGRATION.md](./NEXTJS_VIDEOEDITOR_INTEGRATION.md) for video editing
+1. See [FAQ](/troubleshooting/faq) for common issues and troubleshooting
+2. See [Next.js VideoEditor Integration](/integration-guides/nextjs-video-editor) for video editing
 3. Check the included example project for a complete working implementation
 
 ## Support

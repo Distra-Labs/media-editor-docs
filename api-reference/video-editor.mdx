@@ -7,6 +7,17 @@ description: 'Complete API reference for the VideoEditor component'
 
 The `VideoEditor` component provides a powerful video editing interface with timeline, effects, text overlays, transitions, and export capabilities.
 
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) `ffmpeg` was removed, so the 31 MB of
+WebAssembly named below no longer ships with the package and there is nothing to
+copy into `public/`. React is no longer pinned to 18.2.0 either — React 18 and
+React 19 both work, and the editor also runs with no React at all.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
+
 ---
 
 ## Import
@@ -17,7 +28,7 @@ The `VideoEditor` component provides a powerful video editing interface with tim
 import dynamic from 'next/dynamic';
 
 const VideoEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.VideoEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.VideoEditor })),
   { ssr: false }
 );
 ```
@@ -270,7 +281,7 @@ import { useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 
 const VideoEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.VideoEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.VideoEditor })),
   { ssr: false }
 );
 

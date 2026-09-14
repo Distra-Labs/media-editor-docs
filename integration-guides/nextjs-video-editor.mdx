@@ -1,6 +1,17 @@
 # Next.js VideoEditor Integration Guide
 
-Complete guide for integrating the `@distralabs/media-editor` VideoEditor component into your Next.js application.
+Complete guide for integrating the `@layermetry/media-editor` VideoEditor component into your Next.js application.
+
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) `ffmpeg` was removed, so the 31 MB of
+WebAssembly named below no longer ships with the package and there is nothing to
+copy into `public/`. React is no longer pinned to 18.2.0 either — React 18 and
+React 19 both work, and the editor also runs with no React at all.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -16,9 +27,9 @@ Complete guide for integrating the `@distralabs/media-editor` VideoEditor compon
 
 ## Prerequisites
 
-- Node.js 16.x or higher
+- Node.js 18 or newer
 - Next.js 14.x (not 15.x - see React version requirements)
-- React 18.2.0 (SDK requires React 18, not React 19)
+- React 18 or React 19 — both work. Version 2 does not pin React, and also runs with no React at all.
 - ~40MB of disk space for WASM modules
 
 ## Installation
@@ -26,7 +37,7 @@ Complete guide for integrating the `@distralabs/media-editor` VideoEditor compon
 ### 1. Install the SDK
 
 ```bash
-npm install @distralabs/media-editor
+npm install @layermetry/media-editor
 ```
 
 ### 2. Install Required Dependencies
@@ -41,7 +52,7 @@ npm install framer-motion lucide-react clsx tailwind-merge
 ```json
 {
   "dependencies": {
-    "@distralabs/media-editor": "^1.1.9",
+    "@layermetry/media-editor": "^2.0.0",
     "next": "14.2.15",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -74,17 +85,17 @@ Run this command from your Next.js project root:
 mkdir -p public
 
 # Copy MediaInfo WASM module (for video metadata)
-cp node_modules/@distralabs/media-editor/dist/MediaInfoModule.wasm public/
+cp node_modules/@layermetry/media-editor/dist/MediaInfoModule.wasm public/
 
 # Copy FFmpeg workers (for video encoding/decoding)
-cp node_modules/@distralabs/media-editor/dist/worker.js public/
-cp node_modules/@distralabs/media-editor/dist/const.js public/
-cp node_modules/@distralabs/media-editor/dist/errors.js public/
-cp node_modules/@distralabs/media-editor/dist/decode_worker.js public/
-cp node_modules/@distralabs/media-editor/dist/encode_worker.js public/
+cp node_modules/@layermetry/media-editor/dist/worker.js public/
+cp node_modules/@layermetry/media-editor/dist/const.js public/
+cp node_modules/@layermetry/media-editor/dist/errors.js public/
+cp node_modules/@layermetry/media-editor/dist/decode_worker.js public/
+cp node_modules/@layermetry/media-editor/dist/encode_worker.js public/
 
 # Copy FFmpeg core (31MB WASM file)
-cp -r node_modules/@distralabs/media-editor/dist/umd public/
+cp -r node_modules/@layermetry/media-editor/dist/umd public/
 ```
 
 ### Step 2: Verify Files
@@ -199,7 +210,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamic import to avoid SSR
 const VideoEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.VideoEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.VideoEditor })),
   { ssr: false }
 );
 
@@ -434,7 +445,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
 const VideoEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.VideoEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.VideoEditor })),
   { ssr: false }
 );
 
@@ -679,8 +690,8 @@ export default function VideoStudioPage() {
 
 ## Next Steps
 
-1. See [FAQ.md](./FAQ.md) for common issues and solutions
-2. See [NEXTJS_IMAGEEDITOR_INTEGRATION.md](./NEXTJS_IMAGEEDITOR_INTEGRATION.md) for image editing
+1. See [FAQ](/troubleshooting/faq) for common issues and solutions
+2. See [Next.js ImageEditor Integration](/integration-guides/nextjs-image-editor) for image editing
 3. Check the included example project for a complete working implementation
 
 ## Support

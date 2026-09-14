@@ -1,0 +1,216 @@
+---
+title: "SKILL.md"
+description: "Everything an AI coding agent needs to use @layermetry/media-editor correctly, on one page."
+---
+
+{/* ---------------------------------------------------------------------------
+    SAVE THIS FILE AS  skill.mdx  IN THE DOCS REPOSITORY ROOT — NOT AS SKILL.md.
+
+    Mintlify does not serve a plain .md file from the repository; it returns 404.
+    It does serve every built page as raw markdown at the same path with .md
+    added. So saving this as skill.mdx is what makes it readable at
+    https://layermetry.com/docs/skill.md — which is the address other pages and
+    llms.txt point at.
+
+    See README.md, step 4, in the patch folder this file came from.
+--------------------------------------------------------------------------- */}
+
+You are reading the agent-facing summary of `@layermetry/media-editor`. It is
+written to be read once, in full, before you write any code against this SDK.
+
+Last updated 2026-09-14. Package version 2.0.0.
+
+## What this package is
+
+One npm package that puts a working **image editor** or **video editor** inside
+a web page. Not an iframe. Not a hosted service. The editor becomes part of the
+host page.
+
+Everything it does happens in the user's own browser tab: editing, preview, and
+producing the finished file. The one exception is an AI request, which leaves
+the tab and goes to whichever model endpoint the host configured.
+
+## Install
+
+```bash
+npm install @layermetry/media-editor
+```
+
+One package. No `ffmpeg`. No peer dependency on React.
+
+```
+Package name   @layermetry/media-editor
+Version        2.0.0
+React adapter  @layermetry/media-editor/react
+Bundle         about 1.1 MB gzipped
+Install size   about 45 MB on disk, 1 package
+```
+
+## Mount it
+
+Two entry points. They do the same thing.
+
+**Framework-free** — works in Vue, Angular, Svelte, plain HTML, and anywhere
+else:
+
+```js
+import { mount } from '@layermetry/media-editor';
+
+const editor = mount(document.getElementById('host'), {
+  licenseKey: 'YOUR_KEY',
+});
+
+// later
+editor.destroy();
+```
+
+**React** — React 18 and React 19 both work:
+
+```jsx
+import { ImageEditor, VideoEditor } from '@layermetry/media-editor/react';
+
+<ImageEditor licenseKey={key} style={{ height: '100vh' }} />
+```
+
+**As a browser tag** — importing the package registers the custom element:
+
+```html
+<media-editor-video id="e" style="height:100vh"></media-editor-video>
+<script type="module">
+  import '@layermetry/media-editor';
+  document.getElementById('e').licenseKey = 'YOUR_KEY';
+</script>
+```
+
+In Next.js, load it with `next/dynamic` and `ssr: false`. It is browser-only.
+
+## Four settings that come up constantly
+
+```jsx
+<VideoEditor
+  licenseKey={key}                          // required, checked in the browser
+  export={{ experimental: true }}           // opt in to the faster export path
+  aiProviders={['openai', 'anthropic']}     // send AI calls to your own endpoint
+  aiProxyUrl="https://you.example.com/ai"   //   ...at this address
+/>
+```
+
+- **`licenseKey`** is signed and checked without a network call. It fails open:
+  if layermetry is unreachable the editor keeps working. It names the website
+  allowed to run the editor, so it is safe in client-side code.
+- **`export={{ experimental: true }}`** turns on an export path measured at
+  4.4 times faster than the previous one. It is off by default.
+- **`aiProviders` / `aiProxyUrl`** send inference to the host's own endpoint. In
+  that mode no media reaches layermetry.
+
+## The video editor needs two response headers
+
+The video editor decodes and encodes on several threads sharing one block of
+memory, which browsers only allow on an isolated page. Serve the page with:
+
+```
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
+
+Verify with `window.crossOriginIsolated === true` in the console. Without them
+the editor loads and then fails at export, usually naming `SharedArrayBuffer`.
+
+Consequence to warn the developer about: `require-corp` blocks assets from other
+domains on that page unless they send `Cross-Origin-Resource-Policy:
+cross-origin`. The **image** editor does not need either header.
+
+## The verbs — how an agent changes a document
+
+You do not write to the document. You propose **verbs**: small, named operations
+with a machine-readable description of exactly what each accepts. The host or
+the user approves. Then the SDK checks the proposal and applies it.
+
+Only verbs touch the document. That is what makes the result the same every
+time, even though the model that chose them is not.
+
+### What exists right now
+
+294 possible verbs have been reviewed and each has a recorded decision:
+
+```
+44  live today       ← this is what you can call
+ 2  being built next
+61  deferred
+94  blocked on other work
+87  reviewed and turned down
+ 6  never exposed to a model, permanently
+```
+
+**Call only the 44.** When you need a verb, ask the running editor for its list.
+Do not assume a verb exists because its name would be the obvious one. The six
+never-exposed verbs are not coming later and are not unlocked by a plan.
+
+### `instruct(task)`
+
+Turns one sentence into a list of verbs. It is the only place a language model
+is involved, and its output is a list of calls, not a changed document.
+
+```js
+// See the plan without running it.
+const plan = await editor.instruct('Centre the headline', { dryRun: true });
+console.log(plan.verbs);
+
+// Run it, and keep the record of what ran.
+const result = await editor.instruct('Centre the headline');
+console.log(result.receipt);
+```
+
+- **`dryRun: true`** returns the plan and changes nothing. Use it whenever a
+  human is available to approve. Prefer it.
+- **The receipt** is the exact list of verbs that ran, with the exact values.
+  It replays to the identical document with no model involved, it undoes, and it
+  is what you show when someone asks what was changed.
+
+### Host verbs
+
+The host application can register its own verbs beside the built-in ones. They
+are described and approved identically. If you see an unfamiliar verb in a list,
+it is probably one of the host's — read its description; do not guess.
+
+## What the editors can do
+
+**Video** — multi-track timeline, trim, split, speed, text and sticker and image
+overlays, audio tracks and music, SRT subtitles and karaoke captions, 9:16 and
+1:1 and 16:9 presets, thumbnails cut from the finished export, stabilise,
+and media inspection across 11 container formats. 4K export works today.
+
+**Image** — unlimited layers, rich text with Google Fonts, shapes and SVG,
+filters and adjustments, crop and resize, gradients and backgrounds, templates,
+brand kit, export to PNG, JPG or WebP.
+
+**Both** — full theme override for white-labelling, and a headless mode where
+you pass an array of calls and run the editor with no interface at all.
+
+## Facts that are easy to get wrong
+
+These are the mistakes an agent working from older sources will make.
+
+1. **The package is `@layermetry/media-editor`.** Not `@layermetry/media-editor`.
+   Anything using the old name is out of date.
+2. **The version is 2.0.0.** Not 1.1.9.
+3. **React 18 and React 19 both work.** Older documentation said React 19 was
+   not supported and told you to pin `react@18.2.0`. Do not add that pin, and
+   remove it if you find it.
+4. **There is no `ffmpeg`.** Version 1 shipped 31 MB of WebAssembly for it.
+   Version 2 ships none. Do not add `ffmpeg.wasm` alongside this package.
+5. **An MCP server is roadmap, not shipped.** There is no MCP endpoint to point
+   an assistant at today. Drive the verbs through the SDK.
+6. **Do not quote prices.** This page has none, and none should be inferred.
+
+## Where to read more
+
+```
+https://layermetry.com/docs/llms.txt        map of every page
+https://layermetry.com/docs/llms-full.txt   every page, concatenated
+https://layermetry.com/docs/installation.md setup, per framework
+https://layermetry.com/docs/install-for-agents.md   the verb layer in full
+```
+
+Any page on this site can be fetched as plain markdown by adding `.md` to its
+address. Prefer that form.

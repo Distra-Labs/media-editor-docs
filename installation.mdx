@@ -1,322 +1,424 @@
 ---
-title: 'Installation'
-description: 'Detailed installation instructions for layermetry SDK'
+title: "Installation"
+description: "Install @layermetry/media-editor and put the image or video editor on a page, in any framework."
 ---
 
-## Prerequisites
+## What you are installing
 
-Before installing the layermetry SDK, ensure you have:
+`@layermetry/media-editor` is one npm package that puts a working image editor
+or video editor inside your own page. It is not an iframe and it is not a hosted
+service you redirect people to. The editor becomes part of your page, so it
+inherits your fonts and your layout and you can style it.
 
-- **Node.js** 16.x or higher
-- **Next.js** 14.2.15 (not 15+)
-- **React** 18.2.0 (not React 19)
-- A valid **license key** (contact your account manager)
-
----
-
-## Step 1: Install the SDK
-
-<CodeGroup>
-
-```bash npm
-npm install @distralabs/media-editor@1.1.9
-```
-
-```bash yarn
-yarn add @distralabs/media-editor@1.1.9
-```
-
-```bash pnpm
-pnpm add @distralabs/media-editor@1.1.9
-```
-
-</CodeGroup>
-
----
-
-## Step 2: Install Required Dependencies
-
-The SDK requires specific versions of Next.js and React for compatibility:
+The current version is **2.0.0**.
 
 ```bash
-npm install next@14.2.15 react@18.2.0 react-dom@18.2.0
-npm install framer-motion lucide-react clsx tailwind-merge
+npm install @layermetry/media-editor
 ```
+
+That is one package, about 45 MB on disk. Version 1 pulled in 162 packages; this
+one pulls in none. The part that ships to the browser is a single self-contained
+bundle of about 1.1 MB after compression.
+
+<Note>
+If you are moving from version 1, the package name has changed. Anything that
+still reads `@layermetry/media-editor` is out of date — the package is now
+`@layermetry/media-editor`.
+</Note>
+
+## What it needs to run
+
+| | |
+|---|---|
+| Node.js | 18 or newer, to install and build. The editor itself runs in the browser. |
+| A browser | Any current Chrome, Edge, Firefox or Safari. The editor uses the browser's own video hardware for exporting, so an out-of-date browser will not export. |
+| A licence key | Generate one in your layermetry account, under SDK licences. It is checked in the browser at run time. |
+
+### React 18 and React 19 both work
+
+Version 2 works in **React 18 and React 19**. It also works with no React at all.
+
+This is a change worth spelling out, because the old documentation said the
+opposite. Version 1 was built on React 18.2.0 and told you to pin
+`react@18.2.0` and `react-dom@18.2.0`. Version 2 does not. The editor no longer
+brings its own copy of React into your application: it ships as a
+**custom element**, which is a tag the browser itself knows how to render, the
+same way it knows `<video>`. Your framework only has to put the tag on the page.
+That is why the same bundle runs in React, in Vue with no React installed at
+all, in Angular, in Svelte, in Next.js and in a plain HTML file.
 
 <Warning>
-**Critical:** The SDK is built with React 18.2.0 and is **not compatible with React 19**. Next.js 15+ requires React 19, so you must use **Next.js 14.2.15**.
+Delete any `react@18.2.0` or `react-dom@18.2.0` pin you added for version 1. It
+is no longer needed, and holding React back may now be blocking other upgrades
+in your project for no reason.
 </Warning>
 
----
+## Put an editor on the page
 
-## Step 3: Configure package.json
+There are two ways in, and they do the same thing.
 
-Update your **package.json** to enforce React 18:
+- **`mount(element, props)`** — a function. You give it a DOM element and the
+  settings, it puts the editor inside. This works everywhere, in any framework
+  and in none.
+- **The React components** — `ImageEditor` and `VideoEditor`, from
+  `@layermetry/media-editor/react`. This is a thin wrapper around the same
+  thing, so React people can pass props and not think about DOM elements.
 
-```json package.json
-{
-  "dependencies": {
-    "@distralabs/media-editor": "^1.1.9",
-    "next": "14.2.15",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "framer-motion": "^10.16.4",
-    "lucide-react": "^0.263.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.15",
-    "typescript": "^5"
-  },
-  "overrides": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  }
-}
-```
+Pick the tab for what you are using.
 
-The `overrides` field ensures all dependencies use React 18.2.0.
+<Tabs>
 
----
+<Tab title="React">
 
-## Step 4: Configure Next.js
+```jsx
+import { ImageEditor } from '@layermetry/media-editor/react';
 
-### 4.1 Rename Config File
-
-Next.js 14 doesn't support TypeScript config files. Rename if needed:
-
-```bash
-mv next.config.ts next.config.js
-```
-
-### 4.2 Update next.config.js
-
-```javascript next.config.js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  webpack: (config) => {
-    // Disable node modules that don't work in browser
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      canvas: false,
-      fs: false,
-    };
-    return config;
-  },
-};
-
-module.exports = nextConfig;
-```
-
-### 4.3 For Video Editor: Add URL Rewrites
-
-If using the VideoEditor component, add rewrites for WASM files:
-
-```javascript next.config.js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      canvas: false,
-      fs: false,
-    };
-    return config;
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/studio/:path(MediaInfoModule.wasm|worker.js|const.js|errors.js|decode_worker.js|encode_worker.js)',
-        destination: '/:path',
-      },
-      {
-        source: '/studio/umd/:path*',
-        destination: '/umd/:path*',
-      },
-    ];
-  },
-};
-
-module.exports = nextConfig;
-```
-
----
-
-## Step 5: Import SDK Styles
-
-Add the SDK CSS to your global styles file:
-
-```css app/globals.css
-@import "tailwindcss";
-
-/* IMPORTANT: Import SDK styles */
-@import "@distralabs/media-editor/dist/index.css";
-
-/* Your other styles below */
-```
-
----
-
-## Step 6: Update Fonts (Optional)
-
-If you were using Next.js 15's Geist font, switch to a Next.js 14-compatible font:
-
-```typescript app/layout.tsx
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
-
-export default function RootLayout({ children }) {
+export default function Editor() {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {children}
-      </body>
-    </html>
+    <ImageEditor
+      licenseKey={process.env.REACT_APP_LAYERMETRY_KEY}
+      style={{ height: '100vh' }}
+    />
   );
 }
 ```
 
----
+Works on React 18 and React 19. No version pin is needed.
 
-## Step 7: For Video Editor Only - Copy WASM Files
+</Tab>
 
-The VideoEditor component requires WebAssembly files for video processing.
+<Tab title="Next.js">
 
-### 7.1 Copy Files to Public Folder
+The editor runs in the browser and touches browser-only things, so it must not
+be rendered on the server. `next/dynamic` with `ssr: false` is how you say that.
 
-```bash
-# From your Next.js project root
-mkdir -p public
-cp node_modules/@distralabs/media-editor/dist/MediaInfoModule.wasm public/
-cp node_modules/@distralabs/media-editor/dist/worker.js public/
-cp node_modules/@distralabs/media-editor/dist/const.js public/
-cp node_modules/@distralabs/media-editor/dist/errors.js public/
-cp node_modules/@distralabs/media-editor/dist/decode_worker.js public/
-cp node_modules/@distralabs/media-editor/dist/encode_worker.js public/
-cp -r node_modules/@distralabs/media-editor/dist/umd public/
-```
-
-### 7.2 Verify WASM Files
-
-```bash
-ls -lh public/
-# Should show:
-# MediaInfoModule.wasm (2.3 MB)
-# worker.js
-# const.js
-# errors.js
-# decode_worker.js
-# encode_worker.js
-# umd/ffmpeg-core.wasm (31 MB)
-```
-
-<Note>
-These files are only needed for the VideoEditor component. ImageEditor works without them.
-</Note>
-
----
-
-## Step 8: Clean Install
-
-After configuration changes, clean install dependencies:
-
-```bash
-rm -rf node_modules package-lock.json
-npm install
-```
-
----
-
-## Step 9: Verify Installation
-
-Create a test page to verify the installation:
-
-```typescript app/test/page.tsx
+```jsx
 'use client';
 
 import dynamic from 'next/dynamic';
 
-const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+const VideoEditor = dynamic(
+  () => import('@layermetry/media-editor/react').then((m) => m.VideoEditor),
   { ssr: false }
 );
 
-export default function TestPage() {
+export default function Editor() {
   return (
-    <div className="p-6">
-      <h1>SDK Installation Test</h1>
-      <p>If you see this, the SDK is installed correctly!</p>
-    </div>
+    <VideoEditor
+      licenseKey={process.env.NEXT_PUBLIC_LAYERMETRY_KEY}
+      style={{ height: '100vh' }}
+    />
   );
 }
 ```
 
-Start the dev server:
+If you are using the **video** editor, you also need two response headers. See
+[Video editing needs two headers](#video-editing-needs-two-headers) below.
 
-```bash
-npm run dev
+</Tab>
+
+<Tab title="Vue">
+
+Vue needs no React installed. The editor is a custom element, and Vue renders it
+like any other tag.
+
+```vue
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { mount } from '@layermetry/media-editor';
+
+const host = ref(null);
+let editor;
+
+onMounted(() => {
+  editor = mount(host.value, {
+    licenseKey: import.meta.env.VITE_LAYERMETRY_KEY,
+  });
+});
+
+// Tear the editor down when the component goes away, so its
+// memory and its event listeners go with it.
+onBeforeUnmount(() => editor?.destroy());
+</script>
+
+<template>
+  <div ref="host" style="height: 100vh"></div>
+</template>
 ```
 
-Visit `http://localhost:3000/test` - no errors should appear in the console.
+</Tab>
 
----
+<Tab title="Angular">
 
-## Troubleshooting
+Angular will warn about a tag it does not recognise unless you tell it that some
+tags come from the browser rather than from Angular. That is what
+`CUSTOM_ELEMENTS_SCHEMA` does.
 
-### React Version Errors
+```ts
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnDestroy,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
+import { mount } from '@layermetry/media-editor';
 
-**Error:** "Cannot read properties of undefined (reading 'ReactCurrentOwner')"
+@Component({
+  selector: 'app-editor',
+  standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `<div #host style="height: 100vh"></div>`,
+})
+export class EditorComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('host') host!: ElementRef<HTMLDivElement>;
+  private editor?: { destroy(): void };
 
-**Solution:** Downgrade to Next.js 14.2.15 and React 18.2.0 as shown in Step 2.
+  ngAfterViewInit() {
+    this.editor = mount(this.host.nativeElement, {
+      licenseKey: environment.layermetryKey,
+    });
+  }
 
-### Module Not Found
+  ngOnDestroy() {
+    this.editor?.destroy();
+  }
+}
+```
 
-**Error:** "Module not found: Can't resolve '@distralabs/media-editor'"
+</Tab>
 
-**Solution:**
-1. Verify installation: `npm list @distralabs/media-editor`
-2. Clean install: `rm -rf node_modules && npm install`
+<Tab title="Svelte">
 
-### WASM Files 404
+```svelte
+<script>
+  import { onMount, onDestroy } from 'svelte';
+  import { mount } from '@layermetry/media-editor';
 
-**Error:** "MediaInfoModule.wasm 404 Not Found"
+  let host;
+  let editor;
 
-**Solution:**
-1. Copy WASM files to `public/` folder (Step 7)
-2. Add URL rewrites to `next.config.js` (Step 4.3)
-3. Restart dev server
+  onMount(() => {
+    editor = mount(host, { licenseKey: import.meta.env.VITE_LAYERMETRY_KEY });
+  });
 
-For more issues, see the [FAQ](/troubleshooting/faq).
+  onDestroy(() => editor?.destroy());
+</script>
 
----
+<div bind:this={host} style="height: 100vh"></div>
+```
 
-## Version Compatibility Matrix
+</Tab>
 
-| Next.js | React | SDK     | Status |
-|---------|-------|---------|--------|
-| 15.x    | 19.x  | 1.1.9   | ❌ Not Compatible |
-| 14.2.x  | 18.2  | 1.1.9   | ✅ Recommended |
-| 14.0.x  | 18.2  | 1.1.9   | ✅ Compatible |
-| 13.x    | 18.2  | 1.1.9   | ⚠️ Not Tested |
+<Tab title="Plain HTML">
 
----
+No build step and no framework. Importing the package registers the custom
+elements with the browser; after that the tag works like any other tag.
 
-## Next Steps
+```html
+<!doctype html>
+<html>
+  <body>
+    <media-editor-video id="editor" style="height: 100vh"></media-editor-video>
+
+    <script type="module">
+      // Importing the package teaches the browser what
+      // <media-editor-video> means.
+      import '@layermetry/media-editor';
+
+      document.getElementById('editor').licenseKey = 'YOUR_KEY';
+    </script>
+  </body>
+</html>
+```
+
+You can also skip the tag and call `mount` yourself:
+
+```html
+<div id="host" style="height: 100vh"></div>
+
+<script type="module">
+  import { mount } from '@layermetry/media-editor';
+  mount(document.getElementById('host'), { licenseKey: 'YOUR_KEY' });
+</script>
+```
+
+</Tab>
+
+</Tabs>
+
+## The licence key
+
+The editor checks a licence key in the browser when it starts.
+
+```jsx
+<ImageEditor licenseKey={process.env.NEXT_PUBLIC_LAYERMETRY_KEY} />
+```
+
+Three things about it that are worth knowing before you plan around it.
+
+**The check happens without a network call.** The key carries a signature, and
+the editor checks the signature using a public key it already has. It does not
+phone home to ask whether your key is real.
+
+**It fails open.** If layermetry's servers are unreachable, the editor keeps
+working. Your users do not lose their work because of an outage at our end.
+
+**It is safe in the browser.** The key names which website may run the editor,
+and it is checked against the address the page is actually served from. It is
+not a password, so putting it in a `NEXT_PUBLIC_` or `VITE_` variable is fine.
+
+## Exporting is faster if you ask for it
+
+Exporting — turning what is on the timeline into a finished file — runs entirely
+in the reader's own browser tab, using the video hardware in their machine. No
+file is uploaded, and there is no `ffmpeg` involved. In version 1, `ffmpeg`
+arrived as 31 MB of WebAssembly that every visitor downloaded; in version 2 that
+is 0 MB.
+
+There is a newer export path that is measured at **4.4 times faster than the
+previous exporter**. It is not on by default yet, so you have to ask for it:
+
+```jsx
+<VideoEditor
+  licenseKey={key}
+  export={{ experimental: true }}
+/>
+```
+
+The same setting through `mount`:
+
+```js
+mount(host, { licenseKey: key, export: { experimental: true } });
+```
+
+It is called `experimental` because it is newer and has had less time in front of
+real files, not because it produces a different result. 4K export works today.
+
+## Video editing needs two headers
+
+This one costs people an afternoon if they meet it by surprise, so it is worth
+setting up before you write any code.
+
+The **video** editor decodes and encodes video using several threads at once,
+and those threads share one block of memory. Browsers only allow that sharing on
+a page that has been put in its own isolated process, away from any other site.
+You ask for that isolation by sending two extra lines with the page — two HTTP
+response headers:
+
+```
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
+
+Without them the video editor will load and then fail when it tries to export,
+usually with a browser error mentioning `SharedArrayBuffer`. The **image** editor
+does not need them.
+
+The second header has a consequence that catches people out. `require-corp`
+means the browser will refuse to load anything from another site onto that page
+unless that other site explicitly allows it. So images, fonts and scripts you
+pull from a content delivery network will start failing on that page. Either
+serve them from your own domain, or make sure they send
+`Cross-Origin-Resource-Policy: cross-origin` back.
+
+<Tabs>
+
+<Tab title="Next.js">
+
+```js
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        // Only the route that holds the video editor, so the rest
+        // of the site keeps loading third-party assets normally.
+        source: '/editor/:path*',
+        headers: [
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+        ],
+      },
+    ];
+  },
+};
+```
+
+</Tab>
+
+<Tab title="Vite">
+
+```js
+// vite.config.js
+export default {
+  server: {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
+};
+```
+
+This covers the development server only. Your production host has to send the
+same two headers.
+
+</Tab>
+
+<Tab title="Nginx">
+
+```nginx
+location /editor/ {
+  add_header Cross-Origin-Opener-Policy   same-origin   always;
+  add_header Cross-Origin-Embedder-Policy require-corp  always;
+}
+```
+
+</Tab>
+
+</Tabs>
+
+To check whether it worked, open the page and run this in the browser console:
+
+```js
+console.log(window.crossOriginIsolated); // must print true
+```
+
+If it prints `false`, one of the two headers is missing or is being overwritten
+further along — a proxy or a content delivery network in front of your server is
+the usual culprit.
+
+## Using your own AI models
+
+Any AI feature in the editor can go to your own endpoint instead of ours. You
+give it a list of providers and the address of your own proxy, and inference
+requests go from the reader's browser to your endpoint. In that arrangement the
+media never reaches layermetry at all.
+
+```jsx
+<ImageEditor
+  licenseKey={key}
+  aiProviders={['openai', 'anthropic']}
+  aiProxyUrl="https://your-app.example.com/api/ai"
+/>
+```
+
+Anything that speaks the OpenAI request format works, including models you run
+yourself on your own hardware. The providers wired up today are OpenAI,
+Anthropic and Fal.
+
+If you leave both settings out, the editor uses layermetry-provided models.
+
+## Next
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Build your first editor in 5 minutes
+  <Card title="Install for agents" href="/install-for-agents">
+    The same SDK, set up so a coding agent can drive it: verbs, previewing a
+    plan before it runs, and a record of what ran.
   </Card>
-  <Card title="ImageEditor Guide" icon="image" href="/integration-guides/nextjs-image-editor">
-    Complete ImageEditor integration
-  </Card>
-  <Card title="VideoEditor Guide" icon="video" href="/integration-guides/nextjs-video-editor">
-    Complete VideoEditor integration
-  </Card>
-  <Card title="API Reference" icon="code" href="/api-reference/image-editor">
-    Detailed API documentation
+  <Card title="API reference" href="/api-reference/introduction">
+    Every prop and every method on both editors.
   </Card>
 </CardGroup>

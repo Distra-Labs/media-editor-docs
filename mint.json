@@ -6,6 +6,14 @@
     "light": "/logo/light.png",
     "dark": "/logo/dark.png"
   },
+  "font": {
+    "headings": {
+      "family": "Geist"
+    },
+    "body": {
+      "family": "Geist"
+    }
+  },
   "colors": {
     "primary": "#26D0CE",
     "light": "#3DDAD8",
@@ -17,13 +25,34 @@
   },
   "topbarLinks": [
     {
-      "name": "Support",
-      "url": "mailto:support@layermetry.com"
+      "name": "Product",
+      "url": "https://layermetry.com/sdk"
+    },
+    {
+      "name": "Use cases",
+      "url": "https://layermetry.com/use-cases"
+    },
+    {
+      "name": "Pricing",
+      "url": "https://layermetry.com/pricing"
+    },
+    {
+      "name": "Docs",
+      "url": "https://layermetry.com/docs"
+    },
+    {
+      "name": "Blog",
+      "url": "https://layermetry.com/blog"
+    },
+    {
+      "name": "Sign in",
+      "url": "https://app.layermetry.com/login"
     }
   ],
   "topbarCtaButton": {
-    "name": "Get License",
-    "url": "https://www.layermetry.com"
+    "type": "link",
+    "name": "Start free",
+    "url": "https://app.layermetry.com/signup"
   },
   "tabs": [
     {
@@ -35,7 +64,7 @@
     {
       "name": "Website",
       "icon": "globe",
-      "url": "https://www.layermetry.com"
+      "url": "https://layermetry.com"
     },
     {
       "name": "Support",
@@ -49,7 +78,9 @@
       "pages": [
         "introduction",
         "quickstart",
-        "installation"
+        "installation",
+        "install-for-agents",
+        "skill"
       ]
     },
     {
@@ -82,7 +113,100 @@
     }
   ],
   "footerSocials": {
-    "twitter": "https://x.com/layermetry",
-    "linkedin": "https://www.linkedin.com/company/layermetry"
+    "x": "https://x.com/layermetry",
+    "linkedin": "https://www.linkedin.com/company/layermetry",
+    "website": "https://layermetry.com"
+  },
+  "footer": {
+    "links": [
+      {
+        "title": "Product",
+        "links": [
+          {
+            "label": "Overview",
+            "url": "https://layermetry.com/sdk"
+          },
+          {
+            "label": "Use cases",
+            "url": "https://layermetry.com/use-cases"
+          },
+          {
+            "label": "Pricing",
+            "url": "https://layermetry.com/pricing"
+          },
+          {
+            "label": "Desktop — coming soon",
+            "url": "https://layermetry.com/download"
+          },
+          {
+            "label": "Mobile — coming soon",
+            "url": "https://layermetry.com/download"
+          }
+        ]
+      },
+      {
+        "title": "Developers",
+        "links": [
+          {
+            "label": "Quickstart",
+            "url": "https://layermetry.com/docs/quickstart"
+          },
+          {
+            "label": "Installation",
+            "url": "https://layermetry.com/docs/installation"
+          },
+          {
+            "label": "Install for agents",
+            "url": "https://layermetry.com/docs/install-for-agents"
+          },
+          {
+            "label": "API reference",
+            "url": "https://layermetry.com/docs/api-reference/introduction"
+          }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          {
+            "label": "Home",
+            "url": "https://layermetry.com"
+          },
+          {
+            "label": "New posts by email",
+            "url": "https://layermetry.com/blog"
+          },
+          {
+            "label": "Sign in",
+            "url": "https://app.layermetry.com/login"
+          },
+          {
+            "label": "Contact",
+            "url": "mailto:support@layermetry.com"
+          }
+        ]
+      },
+      {
+        "title": "Legal",
+        "links": [
+          {
+            "label": "Privacy",
+            "url": "https://layermetry.com/privacypolicy"
+          },
+          {
+            "label": "Terms",
+            "url": "https://layermetry.com/termsofuse"
+          },
+          {
+            "label": "Accessibility",
+            "url": "https://layermetry.com/accessibility"
+          },
+          {
+            "label": "Cookies",
+            "url": "https://layermetry.com/cookiepolicy"
+          }
+        ]
+      }
+    ]
   }
 }

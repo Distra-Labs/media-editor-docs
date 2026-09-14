@@ -5,24 +5,35 @@ description: 'Welcome to the layermetry SDK documentation for Next.js'
 
 # layermetry SDK
 
-Welcome to the Next.js integration documentation for `@distralabs/media-editor`.
+Welcome to the Next.js integration documentation for `@layermetry/media-editor`.
 
 ## Overview
 
-The `@distralabs/media-editor` SDK provides powerful image and video editing capabilities for React applications. This documentation covers everything you need to integrate the SDK into your Next.js project.
+The `@layermetry/media-editor` SDK provides powerful image and video editing capabilities for React applications. This documentation covers everything you need to integrate the SDK into your Next.js project.
+
+<Warning>
+**This page still describes the version 1 setup.** In version 2
+(`@layermetry/media-editor` 2.0.0) `ffmpeg` was removed, so the 31 MB of
+WebAssembly named below no longer ships with the package and there is nothing to
+copy into `public/`. React is no longer pinned to 18.2.0 either — React 18 and
+React 19 both work, and the editor also runs with no React at all.
+
+Follow [Installation](/installation) for the version 2 setup. This page is being
+rewritten.
+</Warning>
 
 ## Documentation Files
 
 ### Integration Guides
 
-1. **[NEXTJS_IMAGEEDITOR_INTEGRATION.md](./next/NEXTJS_IMAGEEDITOR_INTEGRATION.md)**
+1. **[Next.js ImageEditor Integration](/integration-guides/nextjs-image-editor)**
    - Complete guide for ImageEditor integration
    - Interface documentation and prop reference
    - Theme customization examples
    - Step-by-step implementation
    - Callback handling and export options
 
-2. **[NEXTJS_VIDEOEDITOR_INTEGRATION.md](./next/NEXTJS_VIDEOEDITOR_INTEGRATION.md)**
+2. **[Next.js VideoEditor Integration](/integration-guides/nextjs-video-editor)**
    - Complete guide for VideoEditor integration
    - WASM setup instructions (critical!)
    - Video processing workflow
@@ -31,7 +42,7 @@ The `@distralabs/media-editor` SDK provides powerful image and video editing cap
 
 ### Troubleshooting
 
-3. **[FAQ.md](./next/FAQ.md)**
+3. **[FAQ](/troubleshooting/faq)**
    - Common issues and solutions
    - React version compatibility problems
    - License validation errors
@@ -44,9 +55,7 @@ The `@distralabs/media-editor` SDK provides powerful image and video editing cap
 ### 1. Install Dependencies
 
 ```bash
-npm install @distralabs/media-editor@1.1.9
-npm install next@14.2.15 react@18.2.0 react-dom@18.2.0
-npm install framer-motion lucide-react
+npm install @layermetry/media-editor
 ```
 
 ### 2. Configure Next.js
@@ -71,7 +80,7 @@ module.exports = nextConfig;
 
 **app/globals.css:**
 ```css
-@import "@distralabs/media-editor/dist/index.css";
+@import "@layermetry/media-editor/dist/index.css";
 ```
 
 ### 4. Use Dynamic Imports
@@ -82,7 +91,7 @@ module.exports = nextConfig;
 import dynamic from 'next/dynamic';
 
 const ImageEditor = dynamic(
-  () => import('@distralabs/media-editor').then(mod => ({ default: mod.ImageEditor })),
+  () => import('@layermetry/media-editor').then(mod => ({ default: mod.ImageEditor })),
   { ssr: false }
 );
 ```
@@ -91,16 +100,16 @@ const ImageEditor = dynamic(
 
 ```bash
 mkdir -p public
-cp node_modules/@distralabs/media-editor/dist/MediaInfoModule.wasm public/
-cp node_modules/@distralabs/media-editor/dist/*.js public/
-cp -r node_modules/@distralabs/media-editor/dist/umd public/
+cp node_modules/@layermetry/media-editor/dist/MediaInfoModule.wasm public/
+cp node_modules/@layermetry/media-editor/dist/*.js public/
+cp -r node_modules/@layermetry/media-editor/dist/umd public/
 ```
 
 ## Key Concepts
 
-### Why React 18.2.0?
+### Which React version?
 
-The SDK is built with React 18.2.0, which is not compatible with React 19. Next.js 15+ requires React 19, so you must use **Next.js 14.2.15** with **React 18.2.0**.
+Version 2 works in React 18 and React 19. It also works with no React at all — the editor ships as a browser custom element, so Vue, Angular, Svelte and plain HTML all run the same bundle. If you pinned `react@18.2.0` for version 1, remove the pin.
 
 ### Why Dynamic Imports?
 
@@ -269,10 +278,14 @@ This includes:
 
 | Next.js | React | SDK | Status |
 |---------|-------|-----|--------|
-| 15.x | 19.x | 1.1.9 | ❌ Not Compatible |
-| 14.2.x | 18.2 | 1.1.9 | ✅ Recommended |
-| 14.0.x | 18.2 | 1.1.9 | ✅ Compatible |
-| 13.x | 18.2 | 1.1.9 | ⚠️ Not Tested |
+| 15.x | 19.x | 2.0.0 | ✅ Works |
+| 14.2.x | 18.2 | 2.0.0 | ✅ Works |
+| 14.0.x | 18.2 | 2.0.0 | ✅ Works |
+| 13.x | 18.2 | 2.0.0 | ⚠️ Not Tested |
+
+Version 2 no longer brings its own copy of React, so the host framework version
+no longer constrains the SDK. The same bundle also runs with no React installed
+at all.
 
 ## Support
 
@@ -298,11 +311,18 @@ Please include:
 
 ## License
 
-The `@distralabs/media-editor` SDK is commercial software. See [EULA.md](../EULA.md) for license terms.
+`@layermetry/media-editor` is commercial software. See the [terms of use](https://layermetry.com/termsofuse) for the licence terms.
 
 ## Changelog
 
-### v1.1.9 (Current)
+### v2.0.0 (Current)
+- Published as `@layermetry/media-editor`. The old `@distralabs` name is retired.
+- Works in React 18 and React 19, in Vue, Angular, Svelte, Next.js and plain HTML — the editor ships as a browser custom element, so the host framework no longer matters.
+- One package instead of 162.
+- `ffmpeg` removed: 31 MB of WebAssembly is now 0. Export uses the browser's own video hardware.
+- A faster export path, measured at 4.4 times the previous exporter. Opt in with `export={{ experimental: true }}`.
+
+### v1.1.9
 - Next.js 14 compatibility
 - React 18.2 support
 - Theme customization
@@ -314,8 +334,8 @@ The `@distralabs/media-editor` SDK is commercial software. See [EULA.md](../EULA
 **Ready to get started?**
 
 Choose your integration guide:
-- [ImageEditor Integration →](./next/NEXTJS_IMAGEEDITOR_INTEGRATION.md)
-- [VideoEditor Integration →](./next/NEXTJS_VIDEOEDITOR_INTEGRATION.md)
+- [ImageEditor Integration →](/integration-guides/nextjs-image-editor)
+- [VideoEditor Integration →](/integration-guides/nextjs-video-editor)
 
 **Having issues?**
-- [Check the FAQ →](./next/FAQ.md)
+- [Check the FAQ →](/troubleshooting/faq)
